@@ -60,7 +60,7 @@ sudo docker network create kafka_network
 
 echo "Переход в папку /PrometheusGrafanaKafkaML..."
 if [ -d "./PrometheusGrafanaKafkaML" ]; then
-  cd /PrometheusGrafanaKafkaML
+  cd PrometheusGrafanaKafkaML
   echo "Запуск docker-compose up --build..."
   sudo docker-compose up --build
 else
