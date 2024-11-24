@@ -14,3 +14,8 @@
 - Docker
 
 
+### web
+- :8050 - dash
+- :3000 - grafana
+- :3100/metrics - Loki
+- 

@@ -42,7 +42,7 @@ install_prometheus() {
     echo "Устанавливаем Prometheus..."
     sudo mkdir -p /opt/prometheus
     cd /opt/prometheus
-
+    cp /PrometheusGrafanaKafkaML/prometheus.yaml /opt/prometheus/
     # Скачиваем последнюю версию Prometheus
     curl -LO https://github.com/prometheus/prometheus/releases/latest/download/prometheus-*-linux-amd64.tar.gz
     tar -xvf prometheus-*-linux-amd64.tar.gz --strip-components=1
