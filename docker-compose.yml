@@ -98,21 +98,17 @@ services:
       - /var/log:/var/log
 
   mlflow-ui:
-    image: python:3.9-slim
+    image: mlflow/mlflow:latest
     container_name: mlflow-ui
     networks:
       - kafka_network
     ports:
-      - "5000:5000"  # Проброс порта для веб-интерфейса MLflow
+      - "8080:8080"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=file:///mlruns
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=file:///mlruns
     volumes:
-      - ./ml-trainer/mlruns:/mlruns  # Монтируем папку с артефактами
-    command: >
-      sh -c "pip install mlflow psycopg2-binary && 
-             mlflow server --backend-store-uri postgresql://postgres:postgres@postgres:5432/stocks 
-                           --default-artifact-root /mlruns 
-                           --host 0.0.0.0 --port 5000"
-    depends_on:
-      - postgres
+      - /root/PrometheusGrafanaKafkaML/ml-trainer/mlruns:/mlruns
 
   dashboard:
     build:
