@@ -40,27 +40,8 @@ install_docker_compose() {
 # Установить Prometheus
 install_prometheus() {
     echo "Устанавливаем Prometheus..."
-    sudo mkdir -p /opt/prometheus
-    sudo cp PrometheusGrafanaKafkaML/prometheus.yml /opt/prometheus/
-    cd /opt/prometheus
-    curl -LO https://github.com/prometheus/prometheus/releases/latest/download/prometheus-*-linux-amd64.tar.gz
-    tar -xvf prometheus-*-linux-amd64.tar.gz --strip-components=1
-    sudo tee /etc/systemd/system/prometheus.service << EOF
-[Unit]
-Description=Prometheus
-After=network.target
-
-[Service]
-User=root
-ExecStart=/opt/prometheus/prometheus \
-  --config.file=/opt/prometheus/prometheus.yml \
-  --storage.tsdb.path=/opt/prometheus/data
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
+    sudo apt install -y prometheus
+    sudo cp PrometheusGrafanaKafkaML/prometheus.yml /etc/prometheus/prometheus.yml
     # Запускаем Prometheus
     sudo systemctl daemon-reload
     sudo systemctl enable prometheus
@@ -80,6 +61,44 @@ install_grafana() {
     echo "Grafana установлена."
 }
 
+install_node_exporter() {
+    echo "Устанавливаем Node Exporter..."
+    # Скачивание и установка Node Exporter
+    wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz
+    tar -xvzf node_exporter-1.8.2.linux-amd64.tar.gz
+    sudo mv node_exporter-1.8.2.linux-amd64/node_exporter /usr/local/bin/
+    rm -rf node_exporter-1.8.2.linux-amd64*
+
+    # Создание пользователя для Node Exporter
+    sudo useradd -rs /bin/false nodeexporter
+
+    # Создание системной службы для Node Exporter
+    sudo bash -c 'cat > /etc/systemd/system/node_exporter.service <<EOF
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=nodeexporter
+Group=nodeexporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+    # Настройка прав
+    sudo chown nodeexporter:nodeexporter /usr/local/bin/node_exporter
+
+    # Запуск и включение Node Exporter
+    sudo systemctl daemon-reload
+    sudo systemctl enable node_exporter
+    sudo systemctl start node_exporter
+
+    echo "Node Exporter установлен."
+}
+
 # Основной процесс установки
 main() {
     echo "Начало установки компонентов..."
@@ -87,6 +106,7 @@ main() {
     install_docker_compose
     install_prometheus
     install_grafana
+    install_node_exporter
     echo "Установка завершена!"
 }
 
