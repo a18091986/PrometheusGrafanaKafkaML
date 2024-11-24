@@ -21,7 +21,7 @@
 - :9090/graph - prometheus
 - :9100/metrics - node exporter
 - :9080 - promtail
-- 
+- :8080 - mlflow
 
 
 ### grafana config
