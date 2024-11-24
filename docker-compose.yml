@@ -1,0 +1,136 @@
+version: "3.8"
+
+networks:
+  kafka_network:
+    external: true
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    networks:
+      - kafka_network
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    networks:
+      - kafka_network
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    hostname: kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+
+  data-producer:
+    build:
+      context: ./data-producer
+    container_name: data-producer
+    networks:
+      - kafka_network
+    depends_on:
+      - kafka
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - TOPIC_NAME=stock_prices
+    command: >
+      sh -c "sleep 15 && python producer.py"
+
+  data-consumer:
+    build:
+      context: ./data-consumer
+    container_name: data-consumer
+    networks:
+      - kafka_network
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - TOPIC_NAME=stock_prices
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=stocks
+      - POSTGRES_HOST=postgres
+    command: >
+      sh -c "sleep 15 && python consumer.py"
+
+  postgres:
+    build:
+      context: ./postgres  # Путь к папке с Dockerfile
+    container_name: postgres
+    networks:
+      - kafka_network
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stocks
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Сохранение данных
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf  # Конфигурация PostgreSQL
+      - ./postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf  # Аутентификация
+
+  ml-trainer:
+    build:
+      context: ./ml-trainer
+    container_name: ml-trainer
+    networks:
+      - kafka_network
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=stocks
+      - POSTGRES_HOST=postgres
+    volumes:
+      - ./ml-trainer:/app
+      - /var/log:/var/log
+
+  dashboard:
+    build:
+      context: ./dashboard
+    container_name: dashboard
+    networks:
+      - kafka_network
+    depends_on:
+      - postgres
+    ports:
+      - "8050:8050"
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: loki
+    networks:
+      - kafka_network
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - /tmp/loki:/tmp/loki  # Добавьте это
+#
+  promtail:
+    image: grafana/promtail:2.9.1
+    container_name: promtail
+    networks:
+      - kafka_network
+    ports:
+      - "9080:9080"
+    depends_on:
+        - loki
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+      - /var/log:/var/log  # Логи хост-системы
+    command: -config.file=/etc/promtail/config.yml
+
+volumes:
+  postgres_data:

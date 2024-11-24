@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS stock_data (
+    id SERIAL PRIMARY KEY,
+    date TEXT NOT NULL,
+    close FLOAT NOT NULL
+);
