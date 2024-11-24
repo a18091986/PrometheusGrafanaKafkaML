@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 # Установить Docker
 install_docker() {
     echo "Устанавливаем Docker..."
