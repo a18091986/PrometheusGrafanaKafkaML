@@ -18,4 +18,5 @@
 - :8050 - dash
 - :3000 - grafana
 - :3100/metrics - Loki
-- 
+- :9090/graph - prometheus
+- :9100/metrics - node exporter
