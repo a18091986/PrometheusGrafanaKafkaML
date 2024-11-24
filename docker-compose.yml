@@ -94,7 +94,25 @@ services:
       - POSTGRES_HOST=postgres
     volumes:
       - ./ml-trainer:/app
+      - ./ml-trainer/mlruns:/app/mlruns
       - /var/log:/var/log
+
+  mlflow-ui:
+    image: python:3.9-slim
+    container_name: mlflow-ui
+    networks:
+      - kafka_network
+    ports:
+      - "5000:5000"  # Проброс порта для веб-интерфейса MLflow
+    volumes:
+      - ./ml-trainer/mlruns:/mlruns  # Монтируем папку с артефактами
+    command: >
+      sh -c "pip install mlflow psycopg2-binary && 
+             mlflow server --backend-store-uri postgresql://postgres:postgres@postgres:5432/stocks 
+                           --default-artifact-root /mlruns 
+                           --host 0.0.0.0 --port 5000"
+    depends_on:
+      - postgres
 
   dashboard:
     build:
