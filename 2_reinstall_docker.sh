@@ -57,6 +57,9 @@ sudo systemctl start docker
 sudo systemctl enable docker
 
 sudo docker network create kafka_network
+sudo mkdir -p /tmp/loki/wal /tmp/loki/chunks /tmp/loki/index /tmp/loki/compactor
+sudo chown -R 10001:10001 /tmp/loki
+
 
 echo "Переход в папку /PrometheusGrafanaKafkaML..."
 if [ -d "./PrometheusGrafanaKafkaML" ]; then
