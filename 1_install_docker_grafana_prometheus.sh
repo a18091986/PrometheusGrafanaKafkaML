@@ -74,7 +74,7 @@ EOF
 install_grafana() {
     echo "Устанавливаем Grafana..."
     sudo apt-get install -y adduser libfontconfig1 musl
-    wget https://dl.grafana.com/oss/release/grafana_11.3.1_amd64.deb
+    sudo wget https://dl.grafana.com/oss/release/grafana_11.3.1_amd64.deb
     sudo dpkg -i grafana_11.3.1_amd64.deb
     sudo systemctl start grafana-server
     sudo systemctl enable grafana-server
