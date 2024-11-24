@@ -58,13 +58,13 @@ sudo systemctl enable docker
 
 sudo docker network create kafka_network
 
-echo "Переход в папку /test/Kafka..."
-if [ -d "/test/Kafka" ]; then
-  cd /test/Kafka
+echo "Переход в папку /PrometheusGrafanaKafkaML..."
+if [ -d "/PrometheusGrafanaKafkaML" ]; then
+  cd /PrometheusGrafanaKafkaML
   echo "Запуск docker-compose up --build..."
   sudo docker-compose up --build
 else
-  echo "Папка /test/Kafka не найдена. Проверьте наличие директории."
+  echo "Папка /PrometheusGrafanaKafkaML не найдена. Проверьте наличие директории."
 fi
 
 
