@@ -71,22 +71,15 @@ EOF
 }
 
 # Установить Grafana
-#install_grafana() {
-#    echo "Устанавливаем Grafana..."
-#    # Добавляем репозиторий Grafana
-#    sudo apt-get install -y software-properties-common
-#    sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
-#    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
-#
-#    sudo apt-get update -y
-#    sudo apt-get install -y grafana
-#
-#    # Запускаем Grafana
-#    sudo systemctl enable grafana-server
-#    sudo systemctl start grafana-server
-#
-#    echo "Grafana установлена."
-#}
+install_grafana() {
+    echo "Устанавливаем Grafana..."
+    sudo apt-get install -y adduser libfontconfig1 musl
+    wget https://dl.grafana.com/oss/release/grafana_11.3.1_amd64.deb
+    sudo dpkg -i grafana_11.3.1_amd64.deb
+    sudo systemctl start grafana-server
+    sudo systemctl enable grafana-server
+    echo "Grafana установлена."
+}
 
 # Основной процесс установки
 main() {
