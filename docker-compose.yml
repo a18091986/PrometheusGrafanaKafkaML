@@ -98,15 +98,13 @@ services:
       - /var/log:/var/log
 
   mlflow-ui:
-    image: mlflow/mlflow:latest
+    build:
+      context: ./mlflow-ui
     container_name: mlflow-ui
     networks:
       - kafka_network
     ports:
       - "8080:8080"
-    environment:
-      - MLFLOW_BACKEND_STORE_URI=file:///mlruns
-      - MLFLOW_DEFAULT_ARTIFACT_ROOT=file:///mlruns
     volumes:
       - /root/PrometheusGrafanaKafkaML/ml-trainer/mlruns:/mlruns
 
