@@ -41,13 +41,10 @@ install_docker_compose() {
 install_prometheus() {
     echo "Устанавливаем Prometheus..."
     sudo mkdir -p /opt/prometheus
+    sudo cp PrometheusGrafanaKafkaML/prometheus.yml /opt/prometheus/
     cd /opt/prometheus
-    cp /PrometheusGrafanaKafkaML/prometheus.yaml /opt/prometheus/
-    # Скачиваем последнюю версию Prometheus
     curl -LO https://github.com/prometheus/prometheus/releases/latest/download/prometheus-*-linux-amd64.tar.gz
     tar -xvf prometheus-*-linux-amd64.tar.gz --strip-components=1
-
-    # Создаём Prometheus сервис
     sudo tee /etc/systemd/system/prometheus.service << EOF
 [Unit]
 Description=Prometheus
