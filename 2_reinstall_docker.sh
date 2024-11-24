@@ -59,7 +59,7 @@ sudo systemctl enable docker
 sudo docker network create kafka_network
 
 echo "Переход в папку /PrometheusGrafanaKafkaML..."
-if [ -d "/PrometheusGrafanaKafkaML" ]; then
+if [ -d "./PrometheusGrafanaKafkaML" ]; then
   cd /PrometheusGrafanaKafkaML
   echo "Запуск docker-compose up --build..."
   sudo docker-compose up --build
